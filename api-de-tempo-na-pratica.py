@@ -25,3 +25,5 @@ if resposta.status_code == 200:
     temp = dados["current"]["temp_c"]
     descricao = dados["current"]["condition"]["text"]
     print(f"A temperatura atual em São Mateus-ES é de {temp}°C com {descricao}.")
+    
+    
