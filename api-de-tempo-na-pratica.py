@@ -6,7 +6,8 @@ api_key = "1986d494aa064214a6e195755260101"
 link_api = "http://api.weatherapi.com/v1/current.json"
 
 parametros = {
-    "key": api_key,
+    
+    "key":api_key,
     "q": "São Mateus,Espirito Santo",
     "lang": "pt"
 }
@@ -24,6 +25,12 @@ if resposta.status_code == 200:
     pprint.pprint(dados)
     temp = dados["current"]["temp_c"]
     descricao = dados["current"]["condition"]["text"]
+    humidade = dados["current"]["humidity"]
     print(f"A temperatura atual em São Mateus-ES é de {temp}°C com {descricao}.")
+    print(f"A humidade atual em São Mateus-ES é de {humidade}%.")
     
-    
+else:
+    print("Erro ao obter os dados da API de clima.")
+    print(resposta.status_code)
+    print(resposta.reason)
+    print(resposta.content)
