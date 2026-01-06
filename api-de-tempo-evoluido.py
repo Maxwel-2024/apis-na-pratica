@@ -14,7 +14,7 @@ class AppClima(ctk.CTk):
         super().__init__()
 
         self.title("Weather Vision v1.0")
-        self.geometry("450x600")
+        self.geometry("450x700")
         self.resizable(False, False)
 
         # Container Principal
@@ -24,8 +24,8 @@ class AppClima(ctk.CTk):
         self.label_titulo = ctk.CTkLabel(self.frame, text="Previsão do Tempo", font=("Roboto", 24, "bold"))
         self.label_titulo.pack(pady=(30, 20))
 
-        self.label_instrucao = ctk.CTkLabel(self.frame, text="Digite Cidade e Estado sem abreviar", font=("Roboto", 12), text_color="gray")
-        self.label_instrucao.pack(pady=(0, 20))
+        self.label_instrucao = ctk.CTkLabel(self.frame, text="Digite cidade e estado separado por vírgula", font=("Roboto", 12), text_color="gray")
+        self.label_instrucao.pack(pady=(0, 10))
 
         self.entrada_cidade = ctk.CTkEntry(self.frame, placeholder_text="Ex: São Mateus, Espírito Santo", width=250, height=40)
         self.entrada_cidade.pack(pady=10)
@@ -46,8 +46,8 @@ class AppClima(ctk.CTk):
         self.res_umidade = ctk.CTkLabel(self.frame, text="Umidade: --%", font=("Roboto", 14), text_color="gray")
         self.res_umidade.pack(pady=(0, 10))
 
-        self.res_localizacao = ctk.CTkLabel(self.frame, text="", font=("Roboto", 12), text_color="gray")
-        self.res_localizacao.pack(pady=(0, 20))
+        self.res_localizacao = ctk.CTkLabel(self.frame, text="", font=("Roboto", 11), text_color="gray")
+        self.res_localizacao.pack(pady=(0, 10))
 
         # Sessão com retry para tolerar falhas transitórias/servidor lento
         self.session = requests.Session()
