@@ -24,7 +24,10 @@ class AppClima(ctk.CTk):
         self.label_titulo = ctk.CTkLabel(self.frame, text="Previsão do Tempo", font=("Roboto", 24, "bold"))
         self.label_titulo.pack(pady=(30, 20))
 
-        self.entrada_cidade = ctk.CTkEntry(self.frame, placeholder_text="Ex: São Mateus, ES", width=250, height=40)
+        self.label_instrucao = ctk.CTkLabel(self.frame, text="Digite Cidade e Estado sem abreviar", font=("Roboto", 12), text_color="gray")
+        self.label_instrucao.pack(pady=(0, 20))
+
+        self.entrada_cidade = ctk.CTkEntry(self.frame, placeholder_text="Ex: São Mateus, Espírito Santo", width=250, height=40)
         self.entrada_cidade.pack(pady=10)
 
         self.botao = ctk.CTkButton(self.frame, text="Consultar", command=self.buscar_clima, font=("Roboto", 14, "bold"), height=40)
@@ -41,7 +44,10 @@ class AppClima(ctk.CTk):
         self.res_desc.pack(pady=(0, 10))
 
         self.res_umidade = ctk.CTkLabel(self.frame, text="Umidade: --%", font=("Roboto", 14), text_color="gray")
-        self.res_umidade.pack(pady=(0, 20))
+        self.res_umidade.pack(pady=(0, 10))
+
+        self.res_localizacao = ctk.CTkLabel(self.frame, text="", font=("Roboto", 12), text_color="gray")
+        self.res_localizacao.pack(pady=(0, 20))
 
         # Sessão com retry para tolerar falhas transitórias/servidor lento
         self.session = requests.Session()
@@ -83,6 +89,7 @@ class AppClima(ctk.CTk):
             self.res_desc.configure(text="Digite uma cidade válida (mínimo 3 caracteres).", text_color="orange")
             self.res_temp.configure(text="--°C")
             self.res_umidade.configure(text="Umidade: --%", text_color="gray")
+            self.res_localizacao.configure(text="")
             return
 
         api_key = "1986d494aa064214a6e195755260101"
@@ -98,6 +105,7 @@ class AppClima(ctk.CTk):
                 api_msg = dados["error"].get("message", "Cidade não encontrada")
                 self.res_desc.configure(text=self._traduzir_mensagem_api(api_msg), text_color="red")
                 self.res_temp.configure(text="--°C")
+                self.res_localizacao.configure(text="")
                 return
 
             # Extração
@@ -105,11 +113,22 @@ class AppClima(ctk.CTk):
             condicao = dados["current"]["condition"]["text"]
             umidade = dados["current"].get("humidity", "--")
             icon_url = "http:" + dados["current"]["condition"]["icon"]
+            
+            # Extração de localização
+            localizacao = dados.get("location", {})
+            nome_cidade = localizacao.get("name", "")
+            estado = localizacao.get("region", "")
+            pais = localizacao.get("country", "")
+            lat = localizacao.get("lat", "")
+            lon = localizacao.get("lon", "")
+            
+            localizacao_texto = f"{nome_cidade}, {estado}, {pais} (Lat: {lat}, Lon: {lon})"
 
             # Atualizar Texto
             self.res_temp.configure(text=f"{int(temp)}°C")
             self.res_desc.configure(text=condicao.capitalize(), text_color="white")
             self.res_umidade.configure(text=f"Umidade: {umidade}%", text_color="white")
+            self.res_localizacao.configure(text=localizacao_texto, text_color="gray")
 
             # Carregar e exibir o ícone do clima (com timeout)
             try:
@@ -129,10 +148,12 @@ class AppClima(ctk.CTk):
             self.res_desc.configure(text="Tempo esgotado. Servidor lento ou sem resposta.", text_color="orange")
             self.res_temp.configure(text="--°C")
             self.res_umidade.configure(text="Umidade: --%", text_color="gray")
+            self.res_localizacao.configure(text="")
         except req_exc.ConnectionError:
             self.res_desc.configure(text="Sem conexão com a internet.", text_color="red")
             self.res_temp.configure(text="--°C")
             self.res_umidade.configure(text="Umidade: --%", text_color="gray")
+            self.res_localizacao.configure(text="")
         except requests.HTTPError as e:
             # Tentar extrair mensagem mais útil do corpo JSON retornado pela API
             api_msg = None
@@ -155,14 +176,17 @@ class AppClima(ctk.CTk):
 
             self.res_temp.configure(text="--°C")
             self.res_umidade.configure(text="Umidade: --%", text_color="gray")
+            self.res_localizacao.configure(text="")
         except (ValueError, KeyError, TypeError):
             self.res_desc.configure(text="Cidade não encontrada ou resposta inválida.", text_color="red")
             self.res_temp.configure(text="--°C")
             self.res_umidade.configure(text="Umidade: --%", text_color="gray")
+            self.res_localizacao.configure(text="")
         except Exception:
             self.res_desc.configure(text="Erro inesperado. Tente novamente.", text_color="red")
             self.res_temp.configure(text="--°C")
             self.res_umidade.configure(text="Umidade: --%", text_color="gray")
+            self.res_localizacao.configure(text="")
 
 if __name__ == "__main__":
     app = AppClima()
